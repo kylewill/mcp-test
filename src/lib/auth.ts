@@ -6,7 +6,7 @@ import { jwt } from "better-auth/plugins";
 
 const prisma = new PrismaClient();
 
-const appUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+const appUrl = (process.env.BETTER_AUTH_URL || "http://localhost:3000").trim();
 
 export const auth = betterAuth({
 	baseURL: appUrl,
