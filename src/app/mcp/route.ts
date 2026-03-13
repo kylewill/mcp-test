@@ -3,7 +3,7 @@ import { WebStandardStreamableHTTPServerTransport } from "@modelcontextprotocol/
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import { z } from "zod";
 
-const appUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+const appUrl = (process.env.BETTER_AUTH_URL || "http://localhost:3000").trim();
 
 let cachedJWKS: ReturnType<typeof createRemoteJWKSet> | null = null;
 

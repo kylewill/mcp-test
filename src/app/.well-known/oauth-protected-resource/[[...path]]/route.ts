@@ -1,4 +1,4 @@
-const appUrl = process.env.BETTER_AUTH_URL || "http://localhost:3000";
+const appUrl = (process.env.BETTER_AUTH_URL || "http://localhost:3000").trim();
 
 const corsHeaders = {
 	"Access-Control-Allow-Origin": "*",
