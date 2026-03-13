@@ -4,11 +4,17 @@ import { toNextJsHandler } from "better-auth/next-js";
 const handlers = toNextJsHandler(auth);
 
 export async function GET(req: Request) {
-	return handlers.GET(req);
+	console.log(`[auth] GET ${req.url}`);
+	const res = await handlers.GET(req);
+	console.log(`[auth] GET response: ${res.status}`);
+	return res;
 }
 
 export async function POST(req: Request) {
-	return handlers.POST(req);
+	console.log(`[auth] POST ${req.url}`);
+	const res = await handlers.POST(req);
+	console.log(`[auth] POST response: ${res.status}`);
+	return res;
 }
 
 export async function OPTIONS() {

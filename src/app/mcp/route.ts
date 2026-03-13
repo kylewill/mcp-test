@@ -39,6 +39,9 @@ async function verifyBearer(
 }
 
 async function handle(request: Request): Promise<Response> {
+	console.log(`[mcp] ${request.method} ${request.url}`);
+	console.log(`[mcp] Headers: ${JSON.stringify(Object.fromEntries(request.headers.entries()))}`);
+
 	if (request.method === "OPTIONS") {
 		return new Response(null, { status: 204, headers: CORS_HEADERS });
 	}
@@ -73,7 +76,9 @@ async function handle(request: Request): Promise<Response> {
 		content: [{ type: "text", text: `User ID: ${user.userId}` }],
 	}));
 
-	const transport = new WebStandardStreamableHTTPServerTransport();
+	const transport = new WebStandardStreamableHTTPServerTransport({
+		enableJsonResponse: true,
+	});
 	await server.connect(transport);
 	const response = await transport.handleRequest(request);
 
