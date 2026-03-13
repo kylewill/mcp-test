@@ -1,26 +1,38 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 
 function ConsentForm() {
 	const params = useSearchParams();
 	const clientName = params.get("client_name") || "MCP Client";
-	const scope = params.get("scope") || "default";
+	const [status, setStatus] = useState<string | null>(null);
 
-	const handleApprove = () => {
-		const form = document.createElement("form");
-		form.method = "POST";
-		form.action = `/api/auth/oauth2/authorize?${params.toString()}`;
+	async function handleConsent(accept: boolean) {
+		setStatus(accept ? "Approving..." : "Denying...");
 
-		const input = document.createElement("input");
-		input.name = "consent";
-		input.value = "true";
-		form.appendChild(input);
+		try {
+			const res = await fetch("/api/mcp/consent", {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({
+					accept,
+					oauth_query: params.toString(),
+				}),
+				credentials: "include",
+			});
 
-		document.body.appendChild(form);
-		form.submit();
-	};
+			const json = await res.json();
+			if (json.redirectUrl) {
+				window.location.href = json.redirectUrl;
+				return;
+			}
+
+			setStatus(`Unexpected response: ${JSON.stringify(json)}`);
+		} catch (e) {
+			setStatus(`Error: ${e}`);
+		}
+	}
 
 	return (
 		<div style={{ padding: 40, fontFamily: "monospace" }}>
@@ -28,8 +40,11 @@ function ConsentForm() {
 			<p>
 				<strong>{clientName}</strong> wants access to your account.
 			</p>
-			<p>Scope: {scope}</p>
-			<button onClick={handleApprove}>Approve</button>
+			<button onClick={() => handleConsent(true)}>Approve</button>
+			<button onClick={() => handleConsent(false)} style={{ marginLeft: 8 }}>
+				Deny
+			</button>
+			{status && <p>{status}</p>}
 		</div>
 	);
 }
