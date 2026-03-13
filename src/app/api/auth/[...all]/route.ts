@@ -3,7 +3,7 @@ import { toNextJsHandler } from "better-auth/next-js";
 
 const { POST: _POST, GET: _GET } = toNextJsHandler(auth);
 
-const corsHeaders = {
+const corsHeaders: Record<string, string> = {
 	"Access-Control-Allow-Origin": "*",
 	"Access-Control-Allow-Methods": "GET, POST, OPTIONS",
 	"Access-Control-Allow-Headers":
@@ -11,23 +11,22 @@ const corsHeaders = {
 };
 
 function addCors(response: Response): Response {
-	const merged = new Response(response.body, response);
 	for (const [k, v] of Object.entries(corsHeaders)) {
-		merged.headers.set(k, v);
+		response.headers.set(k, v);
 	}
-	return merged;
+	return response;
 }
 
 export async function OPTIONS() {
 	return new Response(null, { status: 204, headers: corsHeaders });
 }
 
-export async function GET(req: Request) {
-	const res = await _GET(req);
+export async function GET(...args: Parameters<typeof _GET>) {
+	const res = await _GET(...args);
 	return addCors(res);
 }
 
-export async function POST(req: Request) {
-	const res = await _POST(req);
+export async function POST(...args: Parameters<typeof _POST>) {
+	const res = await _POST(...args);
 	return addCors(res);
 }
